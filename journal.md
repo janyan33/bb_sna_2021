@@ -7,4 +7,4 @@ This spreadsheet contains all information on matings and mountings.
 
 
 ## To do
-Check if "attemped mount" should be treated as mounts. If so, add to patch table. Need to ask students what they meant.
+Check if "attemped mount" should be treated as mounts. If so, add to patch table. Need to ask students what they meant. Same with "tried to mount". 
