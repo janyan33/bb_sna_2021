@@ -1,4 +1,4 @@
-## setwd("C:/Users/jy33/OneDrive/Desktop/R/bedbugs")
+## setwd("C:/Users/janya/Desktop/R/bedbugs/bb_sna_2021")
 
 library(tidyverse)
 library(data.table)
@@ -7,7 +7,7 @@ library(janitor)
 
 ## Loading in dataframe with all observations
 all_data <- read.csv("data/bbsna_raw_combined.csv")
-all_data <- all_data[,-(13:28)] # remove empty columns
+all_data <- remove_empty(all_data, which = c("rows", "cols"), quiet = TRUE)
 
 
 ## Getting all misspelled behaviours and IDs
@@ -28,6 +28,7 @@ all_data <- patch %>%
             mutate(behaviour = ifelse(is.na(patch_behaviour), behaviour, as.character(patch_behaviour))) %>% 
             select(-patch_behaviour)
 
+sort(unique(all_data$behaviour))
 
 ## Fixing mispelled focal individuals
 patch_table_focals <- read.csv("extra/ID_key_focal.csv")
@@ -47,9 +48,16 @@ patch_partners <- all_data %>%
                   left_join(patch_table_partners, by = "social_partner")
 
 all_data <- patch_partners %>% 
-            mutate(social_partner = ifelse(is.na(patch_partner), social_partner, as.character(patch_partner)))
+            mutate(social_partner = ifelse(is.na(patch_partner), "unknown", as.character(patch_partner)))
+
+mate_mount_data <- all_data %>%  
+                   filter(behaviour == "mating" | behaviour == "mount")
+
+sort(unique(mate_mount_data$focal_individual))
+sort(unique(mate_mount_data$social_partner))
 
 
+## CREATING MATING AND MOUNTING MATRICES
 ## Creating a function that turns data into edgelists and then into interaction matrices
 func_mount_mat <- function(all_data, behav) {
                   all_data <- all_data %>% 
@@ -68,20 +76,15 @@ rep_list <- split(all_data, all_data$network)
 mount_matrices <- lapply(rep_list, func_mount_mat, "mount") # Creates list of mounting matrices
 mating_matrices <- lapply(rep_list, func_mount_mat, "mating") # Creates list of mating matrices
 
-# Remove Q because she died after day 1
+# Remove Q from rep 1 because she died after day 1
 mount_matrices[[1]] <- mount_matrices[[1]][-17, -17]
 mating_matrices[[1]] <- mating_matrices[[1]][-17, -17]
 
-# Remove I because he had a deformity and could not mate
+# Remove I from rep 5 because he had a deformity and could not mate
 mount_matrices[[5]] <- mount_matrices[[5]][-9, -9]
 mating_matrices[[5]] <- mating_matrices[[5]][-9, -9]
 
 saveRDS(mount_matrices, "mount_matrices.rds")
 saveRDS(mating_matrices, "mating_matrices.rds")
-
-mating_matrices
-
-
-
 
 
