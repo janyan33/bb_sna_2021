@@ -83,15 +83,16 @@ func_random_model_p1 <- function(random_igraphs){
       attr_i <- attr %>% 
       filter(network == i) %>% 
       rename("name" = "ID") %>% 
-      select(c("name", "thorax.mm", "network", "treatment", "block"))
+      select(c("name", "size", "network", "treatment", "block"))
       
       new_attr <- as.data.frame(vertex_attr(random_igraphs[[i]])) %>% 
                   left_join(attr_i, by = "name")
       sim_attr <- rbind(sim_attr, new_attr)
   }
-  sim_model <- glmer(strength ~ sex*treatment + (1|block) + (1|thorax.mm), data = sim_attr, family = Gamma(link="log"))
-  sim_coef_mat <- as.matrix(fixef(sim_model))
-  sim_coef <- sim_coef_mat[2]
+  sim_model <- glmer(strength ~ sex*treatment + (1|block) + (1|size), data = sim_attr, family = Gamma(link="log"))
+  e_sim_model <- emmeans(sim_model, c("sex", "treatment"))
+  two_z_score_sim <- as.data.frame(pairs(e_sim_model))[6,5]
+  sim_coef <- two_z_score_sim
   return(sim_coef)
 }
 

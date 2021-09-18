@@ -9,6 +9,7 @@ library(glmmTMB)
 library(assortnet)
 library(intergraph)
 library(DHARMa)
+library(emmeans)
 source("scripts/functions.R") ## ADD LATER
 source("scripts/igraphplot2.R") ## ADD LATER
 
@@ -66,48 +67,39 @@ attr_strength$sex <- as.factor(attr_strength$sex)
 attr_strength$size <- as.numeric(attr_strength$size)
 
 ############### SIGNIFICANCE TESTING MALE VS. FEMALE STRENGTH ######
-strength_glmm <- glmer(data = attr_strength, strength ~ sex + treatment + (1|size) + (1|block), family = Gamma(link = "log"))
+strength_glmm <- glmer(data = attr_strength, strength ~ sex*treatment + (1|size) + (1|block), family = Gamma(link = "log"))
 summary(strength_glmm)
 
-# Permutation function (creates new shuffled igraphs, one per rep)
-func_permute_igraph <- function(rep_list) { 
-                       group_list <- strsplit(rep_list$Members, " ")
-                       gbi_matrix <- get_group_by_individual(group_list, data_format = "groups")
-                       ibi_matrix <- get_network(gbi_matrix, data_format = "GBI")
-                       
-                       #shuffle names 
-                       new_names <- sample(colnames(ibi_matrix))
-                       colnames(ibi_matrix) <- new_names
-                       rownames(ibi_matrix) <- new_names
-  
-                       igraph <- graph_from_adjacency_matrix(ibi_matrix, diag = FALSE, weighted = TRUE, mode = "undirected")
-                       igraph <- set_vertex_attr(igraph, "sex", 
-                       value = ifelse(V(igraph)$name %in% LETTERS[1:12], "Male", "Female"))
-                       strength <- strength(igraph)
-                       igraph <- set_vertex_attr(igraph, "strength", value = strength)
-                       return(igraph)
-}  
+e_strength <- emmeans(strength_glmm, c("sex", "treatment"))
+pairs(e_strength)
+(two_z_score <- as.data.frame(pairs(e_strength))[6,5])
 
-#
-n_sim <- 999
+
+## Permutation test
+n_sim_1 <- 999
 set.seed(33)
-sim_coefs <- numeric(n_sim)
+sim_coefs_1 <- numeric(n_sim_1)
 
 for (i in 1:n_sim_1){
-  random_igraphs <- lapply(rep_list_groups, func_permute_igraph)
+  # Creates new igraph objects where the nodes are shuffled
+  random_igraphs <- lapply(rep_list, func_permute_igraph)
   # Runs the glm on the new shuffled igraph objects; save coefs
   sim_coefs_1[i] <- func_random_model_p1(random_igraphs) 
 }
+
 # Plot histogram 
-sim_coefs_1 <- c(sim_coefs_1, obs_coefs_mat[2])
+sim_coefs_1 <- c(sim_coefs_1, two_z_score)
 hist(sim_coefs_1, main = "Prediction 1", xlab = "Coefficient value for sexMale", col = "slategray2", breaks = 40)
-lines(x = c(obs_coefs_mat[2], obs_coefs_mat[2]), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
+lines(x = c(two_z_score, two_z_score), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
 
 # Obtain p-value
-if (obs_coefs_mat[2] >= mean(sim_coefs_1)) {
-  pred1_p <- 2*mean(sim_coefs_1 >= obs_coefs_mat[2]) } else {
-    pred1_p <- 2*mean(sim_coefs_1 <= obs_coefs_mat[2])
+if (two_z_score >= mean(sim_coefs_1)) {
+  pred1_p <- 2*mean(sim_coefs_1 >= two_z_score) } else {
+    pred1_p <- 2*mean(sim_coefs_1 <= two_z_score)
   }
+
+# Add p-value to histogram
+text(x = 0.17, y = 40, "p = 0.04")
 
 
 
