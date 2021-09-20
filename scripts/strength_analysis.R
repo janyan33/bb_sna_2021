@@ -65,8 +65,10 @@ attr_strength$block <- as.factor(attr_strength$block)
 attr_strength$treatment <- as.factor(attr_strength$treatment)
 attr_strength$sex <- as.factor(attr_strength$sex)
 attr_strength$size <- as.numeric(attr_strength$size)
+attr_strength$treatment <- relevel(attr_strength$treatment, "two")
 
 ############### SIGNIFICANCE TESTING MALE VS. FEMALE STRENGTH ######
+## Linear model
 strength_glmm <- glmer(data = attr_strength, strength ~ sex*treatment + (1|size) + (1|block), family = Gamma(link = "log"))
 summary(strength_glmm)
 
@@ -100,6 +102,21 @@ if (two_z_score >= mean(sim_coefs_1)) {
 
 # Add p-value to histogram
 text(x = 0.17, y = 40, "p = 0.04")
+
+#################### VISUALIZATION #############################
+ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex)) + geom_boxplot() + 
+       scale_fill_manual(values = c("sandybrown", "skyblue3"))
+
+
+
+
+
+
+
+
+
+
+
 
 
 

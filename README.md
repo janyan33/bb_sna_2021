@@ -1,5 +1,5 @@
 # Data analysis journal for the bedbug social network project
-Last updated: 2021-09-17
+Last updated: 2021-09-20
 
 ## Data
 I've combined all (day and night) live observation data into one spreadsheet named bbsna_raw_combined.csv  
@@ -8,6 +8,11 @@ This spreadsheet contains all information on matings and mountings.
 
 ## To do
 Check if "attempted mount" should be treated as mounts. If so, add to patch table. Need to ask students what they meant. Same with "tried to mount". 
+
+Re-run mating and mounting stats now that we have the light-time data added. 
+
+Ask Reuven about the strength stats (whether the GLMM makes sense, whether the dianostic plots matter, how to permute the contrasts etc.)
+
 
 ## Strength analysis
 Using the bbsna_aggregations file, I've created aggregation based-social networks for each replicate and exported every individual's strength value into the master attribute file. 
