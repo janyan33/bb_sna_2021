@@ -69,12 +69,16 @@ attr_strength$treatment <- relevel(attr_strength$treatment, "two")
 
 ############### SIGNIFICANCE TESTING MALE VS. FEMALE STRENGTH ######
 ## Linear model
-strength_glmm <- glmer(data = attr_strength, strength ~ sex*treatment + (1|size) + (1|block), family = Gamma(link = "log"))
+strength_glmm <- lmer(data = attr_strength, log(strength) ~ sex*treatment + (1|block) + (1|size))
 summary(strength_glmm)
+Anova(strength_glmm)
+plot(simulateResiduals(strength_glmm))
+
+main_effect_observed <- summary(strength_glmm)$coefficients[2,3]
 
 e_strength <- emmeans(strength_glmm, c("sex", "treatment"))
 pairs(e_strength)
-(two_z_score <- as.data.frame(pairs(e_strength))[6,5])
+(two_z_score <- as.data.frame(pairs(e_strength))[1,5])
 
 
 ## Permutation test
@@ -90,21 +94,21 @@ for (i in 1:n_sim_1){
 }
 
 # Plot histogram 
-sim_coefs_1 <- c(sim_coefs_1, two_z_score)
-hist(sim_coefs_1, main = "Prediction 1", xlab = "Coefficient value for sexMale", col = "slategray2", breaks = 40)
-lines(x = c(two_z_score, two_z_score), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
+sim_coefs_1 <- c(sim_coefs_1, main_effect_observed)
+hist(sim_coefs_1, main = "Prediction 1", xlab = "t-value value for sexMale", col = "azure2", breaks = 40)
+lines(x = c(main_effect_observed, main_effect_observed), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
 
 # Obtain p-value
-if (two_z_score >= mean(sim_coefs_1)) {
-  pred1_p <- 2*mean(sim_coefs_1 >= two_z_score) } else {
-    pred1_p <- 2*mean(sim_coefs_1 <= two_z_score)
+if (main_effect_observed >= mean(sim_coefs_1)) {
+  pred1_p <- 2*mean(sim_coefs_1 >= main_effect_observed) } else {
+    pred1_p <- 2*mean(sim_coefs_1 <= main_effect_observed)
   }
 
 # Add p-value to histogram
-text(x = 0.17, y = 40, "p = 0.04")
+text(x = 0.17, y = 40, "p = 0.006")
 
 #################### VISUALIZATION #############################
-ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex)) + geom_boxplot() + 
+ggplot(data = attr_strength, aes(y = log(strength), x = treatment, fill = sex)) + geom_boxplot() + 
        scale_fill_manual(values = c("sandybrown", "skyblue3"))
 
 

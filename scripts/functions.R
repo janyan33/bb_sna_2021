@@ -89,10 +89,11 @@ func_random_model_p1 <- function(random_igraphs){
                   left_join(attr_i, by = "name")
       sim_attr <- rbind(sim_attr, new_attr)
   }
-  sim_model <- glmer(strength ~ sex*treatment + (1|block) + (1|size), data = sim_attr, family = Gamma(link="log"))
+  sim_model <- lmer(data = sim_attr, log(strength) ~ sex*treatment + (1|block) + (1|size))
   e_sim_model <- emmeans(sim_model, c("sex", "treatment"))
-  two_z_score_sim <- as.data.frame(pairs(e_sim_model))[6,5]
-  sim_coef <- two_z_score_sim
+  two_z_score_sim <- as.data.frame(pairs(e_sim_model))[1,5]
+  main_effect_sim <- summary(sim_model)$coefficients[2,3]
+  sim_coef <- main_effect_sim
   return(sim_coef)
 }
 

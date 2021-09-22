@@ -11,6 +11,7 @@ library(intergraph)
 library(DHARMa)
 library(emmeans)
 library(janitor)
+library(car)
 source("scripts/igraphplot2.R") ## ADD LATER
 
 ## Importing and organizing data
@@ -79,10 +80,46 @@ return(igraph)
 func_matrix_to_igraph(mating_matrices[[1]], mode = "undirected", behaviour = "mating")
 
 
+################# ANALYZING AND VISUALING MATING AND MOUNTING ##################
+attr <- read.csv("bbsna_attributes_full.csv", stringsAsFactors = TRUE)
+attr$network <- as.factor(attr$network)
+attr$treatment <- relevel(attr$treatment, "two")
+
+attr_fem <- attr %>%  
+            filter(sex == "Female")
+
+############################## MOUNTING ANALYSES ############################### 
+## Mounting rate figure
+ggplot(data = attr_fem, aes(y = mounts_in_rate, x = treatment)) + geom_boxplot() + theme(text = element_text(size = 20)) + 
+       geom_jitter(position = position_jitter(width = 0.15, height = 0), color = "sandybrown", alpha = 0.5, size = 1.5) + 
+       labs(y = "", x = "") + scale_y_continuous(breaks = c(5, 10, 15))
+
+## Mounting rate model
+mount_model <- lmer(data = attr_fem, mounts_in_rate ~ treatment + (1|block))
+summary(mount_model)
+Anova(mount_model)
+
+# Diagnostic plots
+plot(mount_model)
+residuals_mount_model <- simulateResiduals(mount_model)
+plot(residuals_mount_model)
 
 
+############################## MATING ANALYSES ################################
+## Mating rate figure
+ggplot(data = attr_fem, aes(y = mating_rate, x = treatment)) + geom_boxplot() + theme(text = element_text(size = 20)) + 
+       geom_jitter(position = position_jitter(width = 0.15, height = 0), color = "sandybrown", alpha = 0.5, size = 1.5) + 
+       labs(y = "", x = "") + scale_y_continuous(breaks = c(0.5, 1, 1.5, 2, 2.5, 3))
 
+## Mounting rate model
+mating_model <- lmer(data = attr_fem, mating_rate ~ treatment + (1|block))
+summary(mating_model)
+Anova(mating_model)
 
+# Diagnostic plots
+plot(mating_model)
+residuals_mating_model <- simulateResiduals(mating_model)
+plot(residuals_mating_model)
 
 
 

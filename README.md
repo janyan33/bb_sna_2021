@@ -9,10 +9,6 @@ This spreadsheet contains all information on matings and mountings.
 ## To do
 Check if "attempted mount" should be treated as mounts. If so, add to patch table. Need to ask students what they meant. Same with "tried to mount". 
 
-Re-run mating and mounting stats now that we have the light-time data added. 
-
-Ask Reuven about the strength stats (whether the GLMM makes sense, whether the dianostic plots matter, how to permute the contrasts etc.)
-
 
 ## Strength analysis
 Using the bbsna_aggregations file, I've created aggregation based-social networks for each replicate and exported every individual's strength value into the master attribute file. 
@@ -22,4 +18,7 @@ As for the permutation test for each of the two treatments, I used emmeans to ex
 I'm still unsure about whether this makes sense. 
 
 
-
+## Mating analysis
+Using mate_mount_data.csv which comes from the raw_data_combined.csv file which is cleaned up in the data_cleaning.R script,  
+I calculated how many matings and mountings each individual received and inputted those values into the bbsna_attributes_full.csv  
+file. I then ran linear mixed models to look at mating and mounting rates as a function of treatment with block as a random factor.  
