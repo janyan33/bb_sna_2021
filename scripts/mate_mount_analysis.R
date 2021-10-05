@@ -88,6 +88,8 @@ attr$treatment <- relevel(attr$treatment, "two")
 attr_fem <- attr %>%  
             filter(sex == "Female")
 
+attr_fem$block <- as.factor(attr_fem$block)
+
 ############################## MOUNTING ANALYSES ############################### 
 ## Mounting rate figure
 ggplot(data = attr_fem, aes(y = mounts_in_rate, x = treatment)) + geom_boxplot() + theme(text = element_text(size = 20)) + 
@@ -120,6 +122,36 @@ Anova(mating_model)
 plot(mating_model)
 residuals_mating_model <- simulateResiduals(mating_model)
 plot(residuals_mating_model)
+
+############################ MATING and STRENGTH ##############################
+## Mating
+ggplot(data = attr_fem, aes(y = mating_rate, x = strength, color = block)) + 
+       geom_point() + facet_grid(~treatment) + geom_smooth(method = "lm")
+
+strength_mate_model <- lmer(data = attr_fem, mating_rate ~ strength*treatment + (1|block))
+summary(strength_mate_model)
+Anova(strength_mate_model)
+
+plot(strength_mate_model)
+plot(simulateResiduals(strength_mate_model))
+
+## Mounting
+ggplot(data = attr_fem, aes(y = mounts_in_rate, x = strength, color = block)) + 
+       geom_point() + facet_grid(~treatment) + geom_smooth(method = "lm")
+
+strength_mount_model <- lmer(data = attr_fem, mounts_in_rate ~ strength*treatment + (1|block))
+summary(strength_mount_model)
+Anova(strength_mount_model)
+
+plot(strength_mount_model)
+plot(simulateResiduals(strength_mount_model))
+
+
+
+
+
+
+
 
 
 
