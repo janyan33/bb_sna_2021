@@ -10,6 +10,7 @@ library(assortnet)
 library(intergraph)
 library(DHARMa)
 library(emmeans)
+library(car)
 source("scripts/functions.R") ## ADD LATER
 source("scripts/igraphplot2.R") ## ADD LATER
 
@@ -108,7 +109,7 @@ if (main_effect_observed >= mean(sim_coefs_1)) {
 text(x = 0.17, y = 40, "p = 0.006")
 
 #################### VISUALIZATION #############################
-ggplot(data = attr_strength, aes(y = log(strength), x = treatment, fill = sex)) + geom_boxplot() + 
+ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex)) + geom_boxplot() + 
        scale_fill_manual(values = c("sandybrown", "skyblue3"))
 
 
