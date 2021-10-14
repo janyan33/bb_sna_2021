@@ -81,7 +81,7 @@ func_matrix_to_igraph(mating_matrices[[1]], mode = "undirected", behaviour = "ma
 
 
 ################# ANALYZING AND VISUALING MATING AND MOUNTING ##################
-attr <- read.csv("bbsna_attributes_full.csv", stringsAsFactors = TRUE)
+attr <- read.csv("data/bbsna_attributes_full.csv", stringsAsFactors = TRUE)
 attr$network <- as.factor(attr$network)
 attr$treatment <- relevel(attr$treatment, "two")
 
