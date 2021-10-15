@@ -51,11 +51,11 @@ func_plot_network <- function(igraph_object, node_size){
                      plot(igraph_object, edge.color = "dimgrey") #, vertex.label = NA) allows us to turn on/off vertex labels
 }
 
-## Aggregation-based networks
+## Visualizing aggregation-based networks
 igraph_objects_agg <- lapply(groups_agg_reps, func_igraph)
 lapply(igraph_objects_agg, node_size = 15, func_plot_network)
 
-## Shelter-based networks
+## Visualizing shelter-based networks
 igraph_objects_shelter <- lapply(groups_shelter_reps, func_igraph)
 lapply(igraph_objects_shelter, node_size = 12, func_plot_network)
 
