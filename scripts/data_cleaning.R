@@ -53,6 +53,10 @@ all_data <- patch_partners %>%
 mate_mount_data <- all_data %>%  
                    filter(behaviour == "mating" | behaviour == "mount")
 
+mating_data <- all_data %>% 
+               filter(behaviour == "mating")
+
+
 sort(unique(mate_mount_data$focal_individual))
 sort(unique(mate_mount_data$social_partner))
 

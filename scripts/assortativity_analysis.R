@@ -53,7 +53,7 @@ func_plot_network <- function(igraph_object, node_size){
 
 ## Visualizing aggregation-based networks
 igraph_objects_agg <- lapply(groups_agg_reps, func_igraph)
-lapply(igraph_objects_agg, node_size = 15, func_plot_network)
+lapply(igraph_objects_agg, node_size = 8, func_plot_network)
 
 ## Visualizing shelter-based networks
 igraph_objects_shelter <- lapply(groups_shelter_reps, func_igraph)

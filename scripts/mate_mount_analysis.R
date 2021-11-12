@@ -126,7 +126,10 @@ plot(residuals_mating_model)
 ############################ MATING and STRENGTH ##############################
 ## Mating
 ggplot(data = attr_fem, aes(y = mating_rate, x = strength, color = block)) + 
-       geom_point() + facet_grid(~treatment) + geom_smooth(method = "lm")
+       geom_point() + facet_grid(~treatment) + geom_smooth(method = "lm") + 
+       scale_color_manual(values = c("darkred", "darkorange2", "goldenrod2")) + 
+       labs(y = "Insemination rate", x = "Strength") + 
+       theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16))
 
 strength_mate_model <- lmer(data = attr_fem, mating_rate ~ strength*treatment + (1|block))
 summary(strength_mate_model)
@@ -137,7 +140,10 @@ plot(simulateResiduals(strength_mate_model))
 
 ## Mounting
 ggplot(data = attr_fem, aes(y = mounts_in_rate, x = strength, color = block)) + 
-       geom_point() + facet_grid(~treatment) + geom_smooth(method = "lm")
+       geom_point() + facet_grid(~treatment) + geom_smooth(method = "lm") + 
+       scale_color_manual(values = c("darkred", "darkorange2", "goldenrod2")) + 
+       labs(y = "Rate of mounts received", x = "Strength") + 
+       theme(axis.text = element_text(size = 14), axis.title = element_text(size = 16))
 
 strength_mount_model <- lmer(data = attr_fem, mounts_in_rate ~ strength*treatment + (1|block))
 summary(strength_mount_model)
