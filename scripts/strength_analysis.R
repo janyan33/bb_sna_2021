@@ -11,8 +11,8 @@ library(intergraph)
 library(DHARMa)
 library(emmeans)
 library(car)
-source("scripts/functions.R") ## ADD LATER
-source("scripts/igraphplot2.R") ## ADD LATER
+source("scripts/functions.R") 
+source("scripts/igraphplot2.R") 
 
 
 ###################### INPUTTING AND ORGANIZING DATA ########################
@@ -75,28 +75,42 @@ summary(strength_glmm)
 Anova(strength_glmm)
 plot(simulateResiduals(strength_glmm))
 
+## Extracting model coefficients
+
+# Model coefficient for main effect of sex
 main_effect_observed <- summary(strength_glmm)$coefficients[2,3]
 
+# Contrasts model
 e_strength <- emmeans(strength_glmm, c("sex", "treatment"))
 pairs(e_strength)
-(two_z_score <- as.data.frame(pairs(e_strength))[1,5])
+plot(e_strength)
 
+# Males vs. females for two shelter treatment
+two_t_ratio <- as.data.frame(pairs(e_strength))[1,5]  
 
-## Permutation test
-n_sim_1 <- 999
+# Males vs. females for twelve shelter treatment
+twelve_t_ratio <- as.data.frame(pairs(e_strength))[6,5]
+
+#################### VISUALIZATION #############################
+## Boxplot
+ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex)) + geom_boxplot() + 
+      scale_fill_manual(values = c("sandybrown", "skyblue3"))
+
+######### PERMUTATION TEST FOR MAIN EFFECT OF SEX #############
+n_sim <- 999
 set.seed(33)
-sim_coefs_1 <- numeric(n_sim_1)
+sim_coefs_1 <- numeric(n_sim)
 
-for (i in 1:n_sim_1){
+for (i in 1:n_sim){
   # Creates new igraph objects where the nodes are shuffled
   random_igraphs <- lapply(rep_list, func_permute_igraph)
   # Runs the glm on the new shuffled igraph objects; save coefs
-  sim_coefs_1[i] <- func_random_model_p1(random_igraphs) 
+  sim_coefs_1[i] <- func_random_model_p1(random_igraphs, statistic = "main") 
 }
 
 # Plot histogram 
 sim_coefs_1 <- c(sim_coefs_1, main_effect_observed)
-hist(sim_coefs_1, main = "Prediction 1", xlab = "t-value value for sexMale", col = "azure2", breaks = 40)
+hist(sim_coefs_1, main = "Main effect of sex", xlab = "t-value value for sexMale", col = "azure2", breaks = 40)
 lines(x = c(main_effect_observed, main_effect_observed), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
 
 # Obtain p-value
@@ -108,15 +122,57 @@ if (main_effect_observed >= mean(sim_coefs_1)) {
 # Add p-value to histogram
 text(x = 0.17, y = 40, "p = 0.006")
 
-#################### VISUALIZATION #############################
-ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex)) + geom_boxplot() + 
-       scale_fill_manual(values = c("sandybrown", "skyblue3"))
+
+######### PERMUTATION TEST FOR TWO SHELTER CONTRAST ############
+set.seed(33)
+contrast_two_sims <- numeric(n_sim)
+
+for (i in 1:n_sim){
+  # Creates new igraph objects where the nodes are shuffled
+  random_igraphs <- lapply(rep_list, func_permute_igraph)
+  # Runs the glm on the new shuffled igraph objects; save coefs
+  contrast_two_sims[i] <- func_random_model_p1(random_igraphs, statistic = "contrast_two") 
+}
+
+# Plot histogram 
+contrast_two_scores <- c(contrast_two_sims, two_t_ratio)
+hist(contrast_two_scores, main = "Two shelter contrast", xlab = "t-value value for sexMale", col = "azure2", breaks = 30)
+lines(x = c(two_t_ratio, two_t_ratio), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
+
+# Obtain p-value
+if (two_t_ratio >= mean(contrast_two_scores)) {
+  con_2_p <- 2*mean(contrast_two_scores >= two_t_ratio) } else {
+    con_2_p <- 2*mean(contrast_two_scores <= two_t_ratio)
+  }
+
+# Add p-value to histogram
+text(x = 0.17, y = 40, "p = 0.006")
 
 
+######### PERMUTATION TEST FOR TWELVE SHELTER CONTRAST ############
+set.seed(33)
+contrast_twelve_sims <- numeric(n_sim)
 
+for (i in 1:n_sim){
+  # Creates new igraph objects where the nodes are shuffled
+  random_igraphs <- lapply(rep_list, func_permute_igraph)
+  # Runs the glm on the new shuffled igraph objects; save coefs
+  contrast_twelve_sims[i] <- func_random_model_p1(random_igraphs, statistic = "contrast_twelve") 
+}
 
+# Plot histogram 
+contrast_twelve_scores <- c(contrast_twelve_sims, twelve_t_ratio)
+hist(contrast_twelve_scores, main = "Twelve shelter contrast", xlab = "t-value value for sexMale", col = "azure2", breaks = 20)
+lines(x = c(twelve_t_ratio, twelve_t_ratio), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
 
+# Obtain p-value
+if (twelve_t_ratio >= mean(contrast_twelve_scores)) {
+  con_12_p <- 2*mean(contrast_twelve_scores >= twelve_t_ratio) } else {
+    con_12_p <- 2*mean(contrast_twelve_scores <= twelve_t_ratio)
+  }
 
+# Add p-value to histogram
+text(x = 0.17, y = 40, "p = 0.126")
 
 
 

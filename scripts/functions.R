@@ -77,7 +77,7 @@ func_permute_igraph <- function(rep_list_group) {
 # Steps: creates a dataframe combining the attributes from the different igraph objects
        # then runs the glm using this new dataframe 
 # Output: the coefficient from the glm for effect of sex on strength
-func_random_model_p1 <- function(random_igraphs){
+func_random_model_p1 <- function(random_igraphs, statistic){
   sim_attr <- data.frame()
   for (i in 1:length(random_igraphs)){
       attr_i <- attr %>% 
@@ -91,12 +91,24 @@ func_random_model_p1 <- function(random_igraphs){
   }
   sim_model <- lmer(data = sim_attr, log(strength) ~ sex*treatment + (1|block) + (1|size))
   e_sim_model <- emmeans(sim_model, c("sex", "treatment"))
-  two_z_score_sim <- as.data.frame(pairs(e_sim_model))[1,5]
-  main_effect_sim <- summary(sim_model)$coefficients[2,3]
-  sim_coef <- main_effect_sim
-  return(sim_coef)
-}
-
+  
+  ## Extracting different model statistics depending on which test we're doing
+  contrast_two_scores <- as.data.frame(pairs(e_sim_model))[1,5]
+  contrast_twelve_scores <- as.data.frame(pairs(e_sim_model))[6,5]
+  main_effect_scores <- summary(sim_model)$coefficients[2,3]
+  
+  ## Determining which set of statistics to output
+  if (statistic == "contrast_two") {
+  output <- contrast_two_scores
+  } else if (statistic == "contrast_twelve") {
+  output <- contrast_twelve_scores
+  } else if (statistic == "main") {
+  output <- main_effect_scores
+  }
+  
+  return(output)
+}  
+  
 ## FUNCTION 7: Assortativity permutation
 # Input: An ibi matrix
 # Output: Histogram of permutation + the observed assortativity score + the p-value
