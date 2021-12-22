@@ -89,7 +89,7 @@ func_random_model_p1 <- function(random_igraphs, statistic){
                   left_join(attr_i, by = "name")
       sim_attr <- rbind(sim_attr, new_attr)
   }
-  sim_model <- lmer(data = sim_attr, log(strength) ~ sex*treatment + (1|block) + (1|size))
+  sim_model <- lmer(data = sim_attr, log(strength) ~ sex*treatment + (1|block))
   e_sim_model <- emmeans(sim_model, c("sex", "treatment"))
   
   ## Extracting different model statistics depending on which test we're doing

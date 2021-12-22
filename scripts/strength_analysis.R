@@ -12,8 +12,6 @@ library(DHARMa)
 library(emmeans)
 library(car)
 source("scripts/functions.R") 
-source("scripts/igraphplot2.R") 
-
 
 ###################### INPUTTING AND ORGANIZING DATA ########################
 ## Data for aggregation-based networks
@@ -70,7 +68,7 @@ attr_strength$treatment <- relevel(attr_strength$treatment, "two")
 
 ############### SIGNIFICANCE TESTING MALE VS. FEMALE STRENGTH ######
 ## Linear model
-strength_glmm <- lmer(data = attr_strength, log(strength) ~ sex*treatment + (1|block) + (1|size))
+strength_glmm <- lmer(data = attr_strength, log(strength) ~ sex*treatment + (1|block))
 summary(strength_glmm)
 Anova(strength_glmm)
 plot(simulateResiduals(strength_glmm))
@@ -93,8 +91,12 @@ twelve_t_ratio <- as.data.frame(pairs(e_strength))[6,5]
 
 #################### VISUALIZATION #############################
 ## Boxplot
-ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex)) + geom_boxplot() + 
-      scale_fill_manual(values = c("sandybrown", "skyblue3"))
+ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex, color = sex)) + 
+      geom_boxplot(alpha = 0.6, outlier.shape = NA) + 
+      scale_fill_manual(values = c("sandybrown", "skyblue3")) + 
+      scale_color_manual(values = c("sandybrown", "skyblue3")) +
+      geom_point(position = position_jitterdodge(), alpha = 0.8, size = 0.5)
+#      geom_jitter(alpha = 0.5, width = 0.2)
 
 ######### PERMUTATION TEST FOR MAIN EFFECT OF SEX #############
 n_sim <- 999
@@ -120,7 +122,7 @@ if (main_effect_observed >= mean(sim_coefs_1)) {
   }
 
 # Add p-value to histogram
-text(x = 0.17, y = 40, "p = 0.006")
+#text(x = 0.17, y = 40, "p = 0.006")
 
 
 ######### PERMUTATION TEST FOR TWO SHELTER CONTRAST ############
@@ -146,7 +148,7 @@ if (two_t_ratio >= mean(contrast_two_scores)) {
   }
 
 # Add p-value to histogram
-text(x = 0.17, y = 40, "p = 0.006")
+#text(x = 0.17, y = 40, "p = 0.006")
 
 
 ######### PERMUTATION TEST FOR TWELVE SHELTER CONTRAST ############
@@ -172,7 +174,7 @@ if (twelve_t_ratio >= mean(contrast_twelve_scores)) {
   }
 
 # Add p-value to histogram
-text(x = 0.17, y = 40, "p = 0.126")
+#text(x = 0.17, y = 40, "p = 0.126")
 
 
 
