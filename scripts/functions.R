@@ -49,7 +49,7 @@ func_plot_network <- function(igraph_object, node_size){
   V(igraph_object)$size <- V(igraph_object)$strength*node_size
   V(igraph_object)$label.color <- "white"
   E(igraph_object)$width <- E(igraph_object)$weight*6
-  plot(igraph_object, edge.color = "dimgrey") #, vertex.label = NA) allows us to turn on/off vertex labels
+  plot(igraph_object, edge.color = "dimgrey", vertex.label = NA) #allows us to turn on/off vertex labels
 }
 
 ## FUNCTION 5: Shuffle node labels

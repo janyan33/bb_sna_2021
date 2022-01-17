@@ -42,6 +42,7 @@ return(igraph)
 
 ## Using func_igraph
 igraph_objects <- lapply(rep_list, func_igraph)
+func_plot_network(igraph_objects[[1]], node_size = 10)
 
 ################ CALCULATING STRENGTH VALUES FOR EACH INDIVIDUAL ####
 func_attr <- function(igraph_objects){
