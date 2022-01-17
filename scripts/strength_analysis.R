@@ -36,7 +36,9 @@ func_igraph <- function(rep_groups){
                igraph <- set_vertex_attr(igraph, "sex", 
                                          value = ifelse(V(igraph)$name %in% LETTERS[1:12], "Male", "Female"))
                strength <- strength(igraph)
+               degree <- degree(igraph)
                igraph <- set_vertex_attr(igraph, "strength", value = strength)
+               igraph <- set_vertex_attr(igraph, "degree", value = degree)
 return(igraph)
 }
 
@@ -68,11 +70,21 @@ attr_strength$size <- as.numeric(attr_strength$size)
 attr_strength$treatment <- relevel(attr_strength$treatment, "two")
 
 ############### SIGNIFICANCE TESTING MALE VS. FEMALE STRENGTH ######
-## Linear model
+## Linear model with strength as response variable
 strength_glmm <- lmer(data = attr_strength, log(strength) ~ sex*treatment + (1|block))
 summary(strength_glmm)
 Anova(strength_glmm)
 plot(simulateResiduals(strength_glmm))
+
+## Linear model with degree as response variable
+degree_glmm <- lmer(data = attr_strength, degree ~ sex*treatment + (1|block))
+summary(degree_glmm)
+Anova(degree_glmm)
+plot(simulateResiduals(degree_glmm)) # NOT GOOD
+
+e_strength_2 <- emmeans(degree_glmm, c("sex", "treatment"))
+pairs(e_strength_2)
+plot(e_strength_2)
 
 ## Extracting model coefficients
 
@@ -90,14 +102,32 @@ two_t_ratio <- as.data.frame(pairs(e_strength))[1,5]
 # Males vs. females for twelve shelter treatment
 twelve_t_ratio <- as.data.frame(pairs(e_strength))[6,5]
 
-#################### VISUALIZATION #############################
+#################### STRENGTH VISUALIZATION #############################
 ## Boxplot
+levels(attr_strength$treatment) <- c("two shelter", "twelve shelter")
+
 ggplot(data = attr_strength, aes(y = strength, x = treatment, fill = sex, color = sex)) + 
       geom_boxplot(alpha = 0.6, outlier.shape = NA) + 
       scale_fill_manual(values = c("sandybrown", "skyblue3")) + 
       scale_color_manual(values = c("sandybrown", "skyblue3")) +
       geom_point(position = position_jitterdodge(), alpha = 0.8, size = 0.5)
 #      geom_jitter(alpha = 0.5, width = 0.2)
+
+#################### DEGREE VISUALIZATION #############################
+## Boxplot
+levels(attr_strength$treatment) <- c("two shelter", "twelve shelter")
+
+ggplot(data = attr_strength, aes(y = degree, x = treatment, fill = sex, color = sex)) + 
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) + 
+  scale_fill_manual(values = c("sandybrown", "skyblue3")) + 
+  scale_color_manual(values = c("sandybrown", "skyblue3")) +
+  geom_point(position = position_jitterdodge(), alpha = 0.8, size = 0.5)
+#      geom_jitter(alpha = 0.5, width = 0.2)
+
+
+
+
+
 
 ######### PERMUTATION TEST FOR MAIN EFFECT OF SEX #############
 n_sim <- 999
