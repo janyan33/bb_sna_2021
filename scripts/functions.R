@@ -96,12 +96,15 @@ func_random_model_p1 <- function(random_igraphs, statistic){
   contrast_two_scores <- as.data.frame(pairs(e_sim_model))[1,5]
   contrast_twelve_scores <- as.data.frame(pairs(e_sim_model))[6,5]
   main_effect_scores <- summary(sim_model)$coefficients[2,3]
+  main_effect_treatment <- summary(sim_model)$coefficients[3,3]
   
   ## Determining which set of statistics to output
   if (statistic == "contrast_two") {
   output <- contrast_two_scores
   } else if (statistic == "contrast_twelve") {
   output <- contrast_twelve_scores
+  } else if (statistic == "main_treatment") {
+  output <- main_effect_treatment
   } else if (statistic == "main") {
   output <- main_effect_scores
   }

@@ -91,6 +91,9 @@ plot(e_strength_2)
 # Model coefficient for main effect of sex
 main_effect_observed <- summary(strength_glmm)$coefficients[2,3]
 
+# Model coefficient for main effect of treatment
+treatment_coef_observed <- summary(strength_glmm)$coefficients[3,3]
+
 # Contrasts model
 e_strength <- emmeans(strength_glmm, c("sex", "treatment"))
 pairs(e_strength)
@@ -130,27 +133,27 @@ ggplot(data = attr_strength, aes(y = degree, x = treatment, fill = sex, color = 
 
 
 ######### PERMUTATION TEST FOR MAIN EFFECT OF SEX #############
-n_sim <- 999
-set.seed(33)
-sim_coefs_1 <- numeric(n_sim)
+#n_sim <- 999
+#set.seed(33)
+#sim_coefs_1 <- numeric(n_sim)
 
-for (i in 1:n_sim){
+#for (i in 1:n_sim){
   # Creates new igraph objects where the nodes are shuffled
-  random_igraphs <- lapply(rep_list, func_permute_igraph)
+#  random_igraphs <- lapply(rep_list, func_permute_igraph)
   # Runs the glm on the new shuffled igraph objects; save coefs
-  sim_coefs_1[i] <- func_random_model_p1(random_igraphs, statistic = "main") 
-}
+#  sim_coefs_1[i] <- func_random_model_p1(random_igraphs, statistic = "main") 
+#}
 
 # Plot histogram 
-sim_coefs_1 <- c(sim_coefs_1, main_effect_observed)
-hist(sim_coefs_1, main = "Main effect of sex", xlab = "t-value value for sexMale", col = "azure2", breaks = 40)
-lines(x = c(main_effect_observed, main_effect_observed), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
+#sim_coefs_1 <- c(sim_coefs_1, main_effect_observed)
+#hist(sim_coefs_1, main = "Main effect of sex", xlab = "t-value value for sexMale", col = "azure2", breaks = 40)
+#lines(x = c(main_effect_observed, main_effect_observed), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
 
 # Obtain p-value
-if (main_effect_observed >= mean(sim_coefs_1)) {
-  pred1_p <- 2*mean(sim_coefs_1 >= main_effect_observed) } else {
-    pred1_p <- 2*mean(sim_coefs_1 <= main_effect_observed)
-  }
+#if (main_effect_observed >= mean(sim_coefs_1)) {
+#  pred1_p <- 2*mean(sim_coefs_1 >= main_effect_observed) } else {
+#    pred1_p <- 2*mean(sim_coefs_1 <= main_effect_observed)
+#  }
 
 # Add p-value to histogram
 #text(x = 0.17, y = 40, "p = 0.006")
@@ -158,6 +161,7 @@ if (main_effect_observed >= mean(sim_coefs_1)) {
 
 ######### PERMUTATION TEST FOR TWO SHELTER CONTRAST ############
 set.seed(33)
+n_sim <- 999
 contrast_two_sims <- numeric(n_sim)
 
 for (i in 1:n_sim){
@@ -168,14 +172,18 @@ for (i in 1:n_sim){
 }
 
 # Plot histogram 
-contrast_two_scores <- c(contrast_two_sims, two_t_ratio)
-hist(contrast_two_scores, main = "Two shelter contrast", xlab = "t-value value for sexMale", col = "azure2", breaks = 30)
-lines(x = c(two_t_ratio, two_t_ratio), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
+contrast_two_scores <-c(contrast_two_sims, two_t_ratio)
+contrast_two_scores <- as.data.frame(contrast_two_scores, colnames("t-scores"))
+
+ggplot(data = contrast_two_scores, aes(x = contrast_two_scores)) + 
+       geom_histogram(fill = "grey", color = "grey60") +
+       geom_vline(xintercept = two_t_ratio, linetype = "dashed", color = "red", size = 1) + 
+       labs(y = "Density", x = "t-scores for male vs. female strength \n in two shelter contrast")
 
 # Obtain p-value
-if (two_t_ratio >= mean(contrast_two_scores)) {
-  con_2_p <- 2*mean(contrast_two_scores >= two_t_ratio) } else {
-    con_2_p <- 2*mean(contrast_two_scores <= two_t_ratio)
+if (two_t_ratio >= mean(contrast_two_scores$contrast_two_scores)) {
+  con_2_p <- 2*mean(contrast_two_scores$contrast_two_scores >= two_t_ratio) } else {
+    con_2_p <- 2*mean(contrast_two_scores$contrast_two_scores <= two_t_ratio)
   }
 
 # Add p-value to histogram
@@ -195,20 +203,42 @@ for (i in 1:n_sim){
 
 # Plot histogram 
 contrast_twelve_scores <- c(contrast_twelve_sims, twelve_t_ratio)
-hist(contrast_twelve_scores, main = "Twelve shelter contrast", xlab = "t-value value for sexMale", col = "azure2", breaks = 20)
-lines(x = c(twelve_t_ratio, twelve_t_ratio), y = c(0, 270), col = "red", lty = "dashed", lwd = 2) 
+contrast_twelve_scores <- as.data.frame(contrast_twelve_scores, colnames("t-scores"))
+
+ggplot(data = contrast_twelve_scores, aes(x = contrast_twelve_scores)) + 
+  geom_histogram(fill = "grey", color = "grey60") +
+  geom_vline(xintercept = twelve_t_ratio, linetype = "dashed", color = "red", size = 1) + 
+  labs(y = "Density", x = "t-scores for male vs. female strength \n in twelve shelter contrast")
+
 
 # Obtain p-value
-if (twelve_t_ratio >= mean(contrast_twelve_scores)) {
-  con_12_p <- 2*mean(contrast_twelve_scores >= twelve_t_ratio) } else {
-    con_12_p <- 2*mean(contrast_twelve_scores <= twelve_t_ratio)
+if (twelve_t_ratio >= mean(contrast_twelve_scores$contrast_twelve_scores)) {
+  con_12_p <- 2*mean(contrast_twelve_scores$contrast_twelve_scores >= twelve_t_ratio) } else {
+    con_12_p <- 2*mean(contrast_twelve_scores$contrast_twelve_scores <= twelve_t_ratio)
   }
 
 # Add p-value to histogram
 #text(x = 0.17, y = 40, "p = 0.126")
 
+################ PERMUTATION TEST FOR MAIN EFFECT OF TREATMENT ###########################
+set.seed(33)
+treatment_coefs <- numeric(n_sim)
 
+for (i in 1:n_sim){
+#Creates new igraph objects where the nodes are shuffled
+random_igraphs <- lapply(rep_list, func_permute_igraph)
+#Runs the glm on the new shuffled igraph objects; save coefs
+treatment_coefs[i] <- func_random_model_p1(random_igraphs, statistic = "main_treatment") 
+}
 
+# Plot histogram 
+all_treatment_coefs <- c(treatment_coefs, treatment_coef_observed)
+all_treatment_coefs <- as.data.frame(all_treatment_coefs, colnames("coefs"))
+
+ggplot(data = all_treatment_coefs, aes(x = all_treatment_coefs)) + 
+  geom_histogram(fill = "grey", color = "grey60") +
+  geom_vline(xintercept = treatment_coef_observed, linetype = "dashed", color = "red", size = 1) + 
+  labs(y = "Density", x = "")
 
 
 
