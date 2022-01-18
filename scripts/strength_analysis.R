@@ -127,11 +127,6 @@ ggplot(data = attr_strength, aes(y = degree, x = treatment, fill = sex, color = 
   geom_point(position = position_jitterdodge(), alpha = 0.8, size = 0.5)
 #      geom_jitter(alpha = 0.5, width = 0.2)
 
-
-
-
-
-
 ######### PERMUTATION TEST FOR MAIN EFFECT OF SEX #############
 #n_sim <- 999
 #set.seed(33)

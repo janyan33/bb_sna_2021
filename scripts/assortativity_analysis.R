@@ -73,6 +73,7 @@ return(ibi_matrix)
 
 ## Function that runs the assortativity permutation test
 func_permute_assort <- function(ibi_matrix){
+                       #ibi_matrix <- ibi_objects_agg[[1]]
                        sex_table <- as.data.frame(colnames(ibi_matrix)) %>% 
                        rename("ID" = "colnames(ibi_matrix)") %>% 
                        mutate(sex = ifelse(ID %in% LETTERS[1:12], "Male", "Female"))
@@ -97,19 +98,21 @@ func_permute_assort <- function(ibi_matrix){
                                                   weighted = TRUE)$r  
                        }
                       sim_assort_index <- c(sim_assort_index, obs_assort_index)
+                      sim_assort_index <- as.data.frame(sim_assort_index)
                       
                       # Results in histogram
-                      hist(sim_assort_index, breaks = 29, xlim = c(min(sim_assort_index), max(sim_assort_index)), 
-                                             ylim = c(0, 180), col = "aliceblue")
-                      lines(x = c(obs_assort_index, obs_assort_index), y = c(0, 150), col = "red", lty = "dashed", lwd = 2)
-  
+                      print(ggplot(data = sim_assort_index, aes(x = sim_assort_index)) + 
+                              geom_histogram(fill = "grey", color = "grey60") +
+                              geom_vline(xintercept = obs_assort_index, linetype = "dashed", color = "red", size = 1) + 
+                              labs(y = "Density", x = "Assortativity index"))
                       # Computing the p-value
-                      if (obs_assort_index >= mean(sim_assort_index)) { 
-                          p <- 2*mean(sim_assort_index >= obs_assort_index) } else {
-                          p <- 2*mean(sim_assort_index <= obs_assort_index)
+                      if (obs_assort_index >= mean(sim_assort_index$sim_assort_index)) { 
+                          p <- 2*mean(sim_assort_index$sim_assort_index >= obs_assort_index) } else {
+                          p <- 2*mean(sim_assort_index$sim_assort_index <= obs_assort_index)
                       }
                       
                       list <- list("p-value" = p, "observed assortativity score" = obs_assort_index)
+                      #list
 return(list)
 }
 
@@ -120,8 +123,6 @@ lapply(ibi_objects_agg, func_permute_assort)
 ## Assortativity for shelter-based networks
 ibi_objects_shelter <- lapply(groups_shelter_reps, func_ibi)
 lapply(ibi_objects_shelter, func_permute_assort)
-
-
 
 
 
