@@ -1,0 +1,11 @@
+treatment,cue,count,total,prop
+male_con,Control,2,29,0.068965517
+male_con,Mated females,27,29,0.931034483
+female_con,Control,0,29,0
+female_con,Mated females,29,29,1
+male,Mated males,10,29,0.344827586
+male,Mated females,19,29,0.655172414
+female,Mated males,5,28,0.178571429
+female,Mated females,23,28,0.821428571
+virgin,Virgin females,21,29,0.724137931
+virgin,Mated females,8,29,0.275862069
