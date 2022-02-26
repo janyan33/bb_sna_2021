@@ -99,7 +99,7 @@ ggplot(data = attr_fem, aes(y = mounts_in_rate, x = treatment)) + geom_boxplot()
 ## Mounting rate model
 mount_model <- lmer(data = attr_fem, mounts_in_rate ~ treatment + (1|block))
 summary(mount_model)
-Anova(mount_model)
+Anova(mount_model, type = 3)
 
 # Diagnostic plots
 plot(mount_model)
@@ -116,7 +116,7 @@ ggplot(data = attr_fem, aes(y = mating_rate, x = treatment)) + geom_boxplot() + 
 ## Mounting rate model
 mating_model <- lmer(data = attr_fem, mating_rate ~ treatment + (1|block))
 summary(mating_model)
-Anova(mating_model)
+Anova(mating_model, type = 3)
 
 # Diagnostic plots
 plot(mating_model)
