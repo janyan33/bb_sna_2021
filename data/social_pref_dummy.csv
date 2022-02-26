@@ -1,0 +1,5 @@
+﻿replicate,camera,trial,treatment,sex,focal_col,choice_col,choice_1 (L),choice_2 (R),final_decision_side,final_decision_scent,notes
+1,dummy,dummy,dummy,M,dummy,dummy,dummy,dummy,dummy,Mated F,
+1,dummy,dummy,dummy,F,dummy,dummy,dummy,dummy,dummy,Mated F,
+1,dummy,dummy,dummy,M,dummy,dummy,dummy,dummy,dummy,Control,
+1,dummy,dummy,dummy,F,dummy,dummy,dummy,dummy,dummy,Control,
